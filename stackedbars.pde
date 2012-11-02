@@ -18,7 +18,8 @@ int holdX = 0;
 int NO_BAR_SELECTION = -1;
 
 void setup() {
-  size(winWidth, winHeight);
+  //size(winWidth, winHeight);
+  size(1300,500);
   smooth();
   randLengths = fillRandomArray(ceil((graphWidth+barStart[0])/barWidth), species, graphHeight);
 }
@@ -44,7 +45,7 @@ void draw() {
 }
 
 int drawBarZoom() {
-  if (holdZoom && holdX < 0) return NO_BAR_SELECTION;
+  if (holdZoom && holdX <= 0) return NO_BAR_SELECTION;
 
   //draw zoom if mouse over graph
   if (holdZoom || mouseX >= barStart[0] && mouseX <= barStart[0]+graphWidth && mouseY >= barStart[1] && mouseY <= barStart[1]+graphHeight) {
@@ -54,7 +55,7 @@ int drawBarZoom() {
     // draw zoomed bar
     strokeWeight(zoomWidth);
     strokeCap(PROJECT);
-    drawColumn(mx, randLengths[barIndex]);  //TODO: still err if holdX was < barStart[0]
+    drawColumn(mx, randLengths[barIndex]);
     //draw zoom boundary
     noFill();
     stroke(0);
