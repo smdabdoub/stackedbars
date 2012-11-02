@@ -69,35 +69,48 @@ int drawBarZoom() {
 
 void drawZoomInfo(int barIndex) {
   int[] bar = randLengths[barIndex];
-  int barCursorPct = round(mouseY/float(winHeight) * 100);
-  int i, laggingSum = 0;
-  println(bar.length);
+  float barCursorPct = mouseY/float(winHeight);
+  float laggingSum = 0;
+  int i;
   for (i = 0; i < bar.length; i++) {
-    if (barCursorPct >= laggingSum && barCursorPct < laggingSum + (bar[i]/float(graphHeight))*winHeight) {
-      drawBarSectionInfo(bar, i);
-      println(i);
+    strokeWeight(2);
+    stroke(0);
+    float foo = (laggingSum + bar[i]/float(graphHeight))*winHeight;
+    line(holdX-round(zoomWidth/2.0), foo, holdX+round(zoomWidth/2.0), foo); 
+    println("cursor loc: " + barCursorPct + ", lagging sum: " + laggingSum + ", upper bound: " + (laggingSum + bar[i]/float(graphHeight)*100));
+    if (barCursorPct >= laggingSum && barCursorPct < (laggingSum + bar[i]/float(graphHeight))) {
+      println("i: " + i);
+      drawBarSectionInfo(barIndex, i);
+      //break;
     }
-    laggingSum += bar[i];
+    laggingSum += bar[i]/float(graphHeight);
   }
   // draw general bar info
   
 }
 
-void drawBarSectionInfo(int[] bar, int secIdx) {
+void drawBarSectionInfo(int barIndex, int secIdx) {
   fill(255);
   stroke(0);
-  strokeWeight(1);
+  strokeWeight(2);
   // draw info box
   int ibWidth = 200, ibHeight = 100, ibXOffset = 10, ibYOffset=10;
   int xStart = holdX+round(zoomWidth/2.0);
   int yStart = mouseY-round(ibHeight/2.0);
-  rect(xStart+ibXOffset, yStart, ibWidth, ibHeight);
+  rect(xStart+ibXOffset, yStart, ibWidth, ibHeight, 10);
   // draw triangle pointer
-  triangle(xStart, yStart+round(ibHeight/2.0), xStart+ibXOffset, yStart+round(ibHeight/2.0)-ibYOffset, xStart+ibXOffset, yStart+round(ibHeight/2.0)+ibYOffset);
+  line(xStart, yStart+round(ibHeight/2.0), xStart+ibXOffset, yStart+round(ibHeight/2.0)-ibYOffset);
+  line(xStart, yStart+round(ibHeight/2.0), xStart+ibXOffset, yStart+round(ibHeight/2.0)+ibYOffset);
+  //fill area within pointer
+  strokeWeight(1);
   stroke(255);
-  line(xStart+ibXOffset, yStart+round(ibHeight/2.0)-ibYOffset+1, xStart+ibXOffset, yStart+round(ibHeight/2.0)+ibYOffset-1);
+  triangle(xStart+2, yStart+round(ibHeight/2.0), xStart+ibXOffset+2, yStart+round(ibHeight/2.0)-ibYOffset+1, xStart+ibXOffset+2, yStart+round(ibHeight/2.0)+ibYOffset-1);
   // fill info box with info
-  //PVector ibOrigin
+  strokeWeight(1);
+  int[] ibOrigin = new int[]{round(xStart+ibXOffset*1.5), round(yStart+ibYOffset*1.5)};
+  stroke(50);
+  fill(colors[secIdx][0], colors[secIdx][1], colors[secIdx][2]);
+  rect(ibOrigin[0], ibOrigin[1], 10, 10);
 }
 
 void drawColumn(int col, int[] bar) {
