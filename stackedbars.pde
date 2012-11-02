@@ -90,13 +90,18 @@ void drawZoomInfo(int barIndex) {
 }
 
 void drawBarSectionInfo(int barIndex, int secIdx) {
-  fill(255);
-  stroke(0);
-  strokeWeight(2);
-  // draw info box
   int ibWidth = 200, ibHeight = 100, ibXOffset = 10, ibYOffset=10;
   int xStart = holdX+round(zoomWidth/2.0);
   int yStart = mouseY-round(ibHeight/2.0);
+  // shadow
+  fill(125);
+  stroke(0);
+  strokeWeight(0.3);
+  rect(xStart+ibXOffset+3.5, yStart+3.5, ibWidth, ibHeight, 12.5);
+  // draw info box
+  fill(255);
+  stroke(0);
+  strokeWeight(2);
   rect(xStart+ibXOffset, yStart, ibWidth, ibHeight, 10);
   // draw triangle pointer
   line(xStart, yStart+round(ibHeight/2.0), xStart+ibXOffset, yStart+round(ibHeight/2.0)-ibYOffset);
