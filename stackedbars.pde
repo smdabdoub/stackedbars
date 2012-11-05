@@ -9,10 +9,12 @@ int winHeight = barStart[1]*2+graphHeight;
 int species = 10;
 int[][] colors = {{178,16,67},{26,212,22},{252,46,193},{27,80,185},{153,204,238},
                   {214,113,11},{246,252,37},{193,93,96},{147,197,163},{132,41,227}};
-int[][] randLengths;
+float[][] randLengths;
 boolean filled = false;
+boolean sideways = false;
 
 int zoomWidth = 35;
+int zoomBoxStrokeWeight = 2;
 boolean holdZoom = false;
 int holdX = 0;
 int NO_BAR_SELECTION = -1;
@@ -32,10 +34,9 @@ void draw() {
   rect(barStart[0],barStart[1],graphWidth,graphHeight);
   // draw graph
   strokeWeight(barWidth + 0.5);
-  strokeCap(PROJECT);
   int lenDex = 0;
   for(int i=barStart[0]; i <= graphWidth+barStart[0]; i+=barWidth) {
-    drawColumn(i, randLengths[lenDex]);
+    drawColumn(i, randLengths[lenDex], barStart[1], graphHeight);
     lenDex++;
   }
   
@@ -50,16 +51,16 @@ int drawBarZoom() {
   //draw zoom if mouse over graph
   if (holdZoom || mouseX >= barStart[0] && mouseX <= barStart[0]+graphWidth && mouseY >= barStart[1] && mouseY <= barStart[1]+graphHeight) {
     int mx = holdZoom ? holdX : mouseX;
-    holdX = mx;
+    holdX = mx;    
     int barIndex = (mx-barStart[0]) / barWidth;
     // draw zoomed bar
     strokeWeight(zoomWidth);
-    strokeCap(PROJECT);
-    drawColumn(mx, randLengths[barIndex]);
+    strokeCap(SQUARE);
+    drawColumn(mx, randLengths[barIndex], zoomBoxStrokeWeight, winHeight-zoomBoxStrokeWeight*2);
     //draw zoom boundary
     noFill();
     stroke(0);
-    strokeWeight(2);
+    strokeWeight(zoomBoxStrokeWeight);
     rect(mx - zoomWidth/2, 1, zoomWidth, winHeight-2);
     
     return barIndex;
@@ -69,25 +70,17 @@ int drawBarZoom() {
 }
 
 void drawZoomInfo(int barIndex) {
-  int[] bar = randLengths[barIndex];
+  float[] bar = randLengths[barIndex];
   float barCursorPct = mouseY/float(winHeight);
   float laggingSum = 0;
-  int i;
-  for (i = 0; i < bar.length; i++) {
-    strokeWeight(2);
-    stroke(0);
-    float foo = (laggingSum + bar[i]/float(graphHeight))*winHeight;
-    line(holdX-round(zoomWidth/2.0), foo, holdX+round(zoomWidth/2.0), foo); 
-    println("cursor loc: " + barCursorPct + ", lagging sum: " + laggingSum + ", upper bound: " + (laggingSum + bar[i]/float(graphHeight)*100));
-    if (barCursorPct >= laggingSum && barCursorPct < (laggingSum + bar[i]/float(graphHeight))) {
-      println("i: " + i);
+  for (int i = 0; i < bar.length; i++) {
+    if (barCursorPct >= laggingSum && barCursorPct < (laggingSum + bar[i])) {
       drawBarSectionInfo(barIndex, i);
-      //break;
+      break;
     }
-    laggingSum += bar[i]/float(graphHeight);
+    laggingSum += bar[i];
   }
-  // draw general bar info
-  
+  //TODO: draw whole-column info
 }
 
 void drawBarSectionInfo(int barIndex, int secIdx) {
@@ -119,36 +112,36 @@ void drawBarSectionInfo(int barIndex, int secIdx) {
   rect(ibOrigin[0], ibOrigin[1], 10, 10);
 }
 
-void drawColumn(int col, int[] bar) {
-  int laggingSum = 0;
+void drawColumn(int col, float[] bar, float yStart, int barHeight) {
+  float laggingSum = yStart;
   
   for (int i=0; i < species; i++) {
     stroke(colors[i][0], colors[i][1], colors[i][2]);
-    line(col, barStart[1]+laggingSum, col, barStart[1]+laggingSum+bar[i]);
-    laggingSum += bar[i];
+    line(col, laggingSum, col, (laggingSum+bar[i]*barHeight));
+    laggingSum += bar[i]*barHeight;
   }
 }
 
 
-int[][] fillRandomArray(int rows, int cols, int height) {
-  int[][] ra = new int[rows][cols];
+float[][] fillRandomArray(int rows, int cols, int barHeight) {
+  float[][] ra = new float[rows][cols];
   
    for (int i=0; i < rows; i++) {
-       ra[i] = randomLengths(graphHeight, species);
+       ra[i] = randomLengths(barHeight, species);
    } 
    return ra;
 }
 
 
-int[] randomLengths(int height, int bins) {
-  int prob = height;
-  int[] lens = new int[bins];
+float[] randomLengths(int barHeight, int bins) {
+  int prob = 1;
+  float[] lens = new float[bins];
   int[] sign = {1, -1};
-  int sum = 0;
+  float sum = 0;
   
   for (int i = 0; i < bins-1; i++) {
-    lens[i] = int(random(prob*0.08, prob*0.1));
-    lens[i] += sign[i%2] * int(random(prob*0.05));
+    lens[i] = random(prob*0.08, prob*0.1);
+    lens[i] += sign[i%2] * random(prob*0.05);
     sum += lens[i];
   }
   lens[bins-1] = prob - sum;
