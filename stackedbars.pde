@@ -1,8 +1,8 @@
 
 
-int graphWidth = 1280; 
-int graphHeight = 480;
-int[] barStart = {10, 10};
+int graphWidth = 1600; 
+int graphHeight = 600;
+int[] barStart = {30, 30};
 int barWidth = 2;
 int winWidth = barStart[0]*2+graphWidth;
 int winHeight = barStart[1]*2+graphHeight;
@@ -20,8 +20,8 @@ int holdX = 0;
 int NO_BAR_SELECTION = -1;
 
 void setup() {
-  //size(winWidth, winHeight);
-  size(1300,500);
+  size(winWidth, winHeight);
+  //size(1300,500);
   smooth();
   randLengths = fillRandomArray(ceil((graphWidth+barStart[0])/barWidth), species, graphHeight);
 }
@@ -30,8 +30,9 @@ void draw() {
   background(175);
   // draw boundary
   fill(175);
-  stroke(255);
-  rect(barStart[0],barStart[1],graphWidth,graphHeight);
+  stroke(0);
+  strokeWeight(2);
+  rect(barStart[0]-2,barStart[1]-1,graphWidth+4,graphHeight+2);
   // draw graph
   strokeWeight(barWidth + 0.5);
   int lenDex = 0;
